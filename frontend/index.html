@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Pro - Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        
+        .user-name {
+            color: white;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            max-width: 1600px;
+            margin: 20px auto;
+            width: 100%;
+            gap: 20px;
+            padding: 0 20px 20px;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: calc(100vh - 140px);
+        }
+        
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: linear-gradient(to bottom, #fafafa, #ffffff);
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 18px 24px;
+            border-radius: 20px;
+            animation: slideIn 0.3s ease;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .assistant-message {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .message-time {
+            font-size: 0.75em;
+            opacity: 0.8;
+            margin-top: 8px;
+            display: block;
+        }
+        
+        .chat-input-container {
+            padding: 25px 30px;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 18px 25px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            color: #333;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 18px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        select, input[type="range"], input[type="file"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            color: #333;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        select:focus, textarea:focus {
+            border-color: #667eea;
+            background: white;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .slider-value {
+            float: right;
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            gap: 5px;
+        }
+        
+        .typing-indicator span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        .pdf-status {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            color: #ff6b6b;
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 0.9em;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-connected {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #006400;
+        }
+
+        .status-disconnected {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #8b0000;
+        }
+        
+        input[type="file"] {
+            font-size: 0.9em;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="connectionStatus" class="connection-status status-disconnected">
+        🔴 Checking...
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <h1>💎 AI Chat Pro Designed with LLM Models and Love❤️</h1>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">👤</div>
+            <span class="user-name" id="userName">User</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>Settings</h3>
+            
+            <div class="control-group">
+                <label>AI Model</label>
+                <select id="modelSelect">
+                    <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+                    <option value="llama-3.1-70b-versatile">Llama 3.1 70B</option>
+                    <option value="llama-3.1-8b-instant">Llama 3.1 8B (Fast)</option>
+                    <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    Temperature 
+                    <span class="slider-value" id="tempValue">0.7</span>
+                </label>
+                <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    Max Tokens 
+                    <span class="slider-value" id="tokensValue">2048</span>
+                </label>
+                <input type="range" id="maxTokens" min="512" max="4096" step="128" value="2048">
+            </div>
+            
+            <div class="control-group">
+                <label>System Prompt</label>
+                <textarea id="systemPrompt" placeholder="Define AI behavior...">You are a helpful, friendly AI assistant. Provide accurate and thoughtful responses, thanks.</textarea>
+            </div>
+            
+            <div class="control-group">
+                <label>📄 Upload PDF</label>
+                <input type="file" id="pdfFile" accept=".pdf">
+                <button class="btn" onclick="uploadPDF()" style="width: 100%; margin-top: 10px;">Upload</button>
+                <div id="pdfStatus"></div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="clearChat()" style="width: 100%; margin-top: 20px;">🗑️ Clear Chat</button>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="messageCount">0</div>
+                    <div class="stat-label">Messages</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="tokenCount">0</div>
+                    <div class="stat-label">Tokens</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant-message">
+                    Welcome There! I'm your AI assistant Rishi. Upload a PDF or just start chatting with me!
+                    <span class="message-time" id="welcomeTime"></span>
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="messageInput" 
+                    placeholder="✨ Type your message here..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="btn" onclick="sendMessage()" id="sendBtn">Send </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL= window.location.hostname.includes('devtunnels')
+        ? window.location.origin 
+    : '';
+        let SESSION_ID = 'session_' + Date.now();
+        let messageCount = 0;
+        let totalTokens = 0;
+        let pdfUploaded = false;
+        let currentUser = null;
+        
+        // Initialize
+        window.addEventListener('load', () => {
+            checkAuth();
+            testConnection();
+            updateWelcomeTime();
+        });
+        
+        function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(userStr);
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            
+            // Set user-specific session
+            SESSION_ID = 'session_' + currentUser.email + '_' + Date.now();
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        async function testConnection() {
+    const statusDiv = document.getElementById('connectionStatus');
+    
+    try {
+        const apiUrl = API_URL || window.location.origin;
+        const response = await fetch(`${apiUrl}/api/stats`);
+        
+        if (response.ok) {
+            statusDiv.textContent = '🟢 Connected';
+            statusDiv.className = 'connection-status status-connected';
+            setTimeout(() => statusDiv.style.display = 'none', 3000);
+            return;
+        }
+    } catch (error) {
+        console.log('Connection test failed:', error);
+    }
+    
+    statusDiv.textContent = '🔴 Offline';
+    statusDiv.className = 'connection-status status-disconnected';
+}
+        
+        
+        function updateWelcomeTime() {
+            const now = new Date();
+            document.getElementById('welcomeTime').textContent = 
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        document.getElementById('temperature').addEventListener('input', (e) => {
+            document.getElementById('tempValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('maxTokens').addEventListener('input', (e) => {
+            document.getElementById('tokensValue').textContent = e.target.value;
+        });
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            document.getElementById('loading').classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: SESSION_ID,
+                        user_email: currentUser.email,
+                        system_prompt: document.getElementById('systemPrompt').value,
+                        model: document.getElementById('modelSelect').value,
+                        temperature: parseFloat(document.getElementById('temperature').value),
+                        max_tokens: parseInt(document.getElementById('maxTokens').value),
+                        use_pdf: pdfUploaded
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+                
+                const data = await response.json();
+                addMessage(data.response, 'assistant');
+                totalTokens += data.tokens;
+                updateStats();
+                
+            } catch (error) {
+                addMessage('❌ Error: ' + error.message, 'assistant');
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+                sendBtn.disabled = false;
+            }
+        }
+        
+        function addMessage(text, role) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = text + `<span class="message-time">${timeStr}</span>`;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            if (role === 'user') {
+                messageCount++;
+                updateStats();
+            }
+        }
+        
+        async function uploadPDF() {
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a PDF file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const statusDiv = document.getElementById('pdfStatus');
+            statusDiv.innerHTML = '<div style="color: #667eea;">📤 Uploading...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/upload-pdf?session_id=${SESSION_ID}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Upload failed');
+                
+                const data = await response.json();
+                pdfUploaded = true;
+                statusDiv.innerHTML = `
+                    <div class="pdf-status">
+                        ${data.filename}<br>
+                        ${data.chunks} chunks loaded
+                    </div>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = '<div style="color: #ff4444;">❌ Upload failed</div>';
+            }
+        }
+        
+        async function clearChat() {
+            if (!confirm('Clear all messages?')) return;
+            
+            try {
+                await fetch(`${API_URL}/api/clear-session?session_id=${SESSION_ID}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="message assistant-message">
+                        ✨ Chat cleared! Let's start fresh!
+                        <span class="message-time">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                `;
+                
+                messageCount = 0;
+                totalTokens = 0;
+                pdfUploaded = false;
+                document.getElementById('pdfStatus').innerHTML = '';
+                updateStats();
+                
+            } catch (error) {
+                alert('Failed to clear chat.');
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('messageCount').textContent = messageCount;
+            document.getElementById('tokenCount').textContent = totalTokens;
+        }
+    </script>
+</body>
+</html>
